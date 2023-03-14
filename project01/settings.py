@@ -12,18 +12,25 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 
+import os
+from dotenv import load_dotenv
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+dotenv_path = os.path.join(str(BASE_DIR), '.env')
+load_dotenv(dotenv_path)
+
+env = os.environ
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(&i9jo87gk_5=0_9(2mgd&#%e292o3ebz#w5hdz1z7fo36q@ww'
+SECRET_KEY = env.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.get('DEBUG') == 'true'
 
 ALLOWED_HOSTS = []
 
@@ -73,10 +80,24 @@ WSGI_APPLICATION = 'project01.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+# # sqlite3 setup
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+# mysql setup
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': env.get('DB_ENGINE', 'django.db.backends.mysql'),
+        'NAME': env.get('DB_NAME', 'django_db'),
+        'USER': env.get('DB_USER', 'root'),
+        'PASSWORD': env.get('DB_PASSWORD', ''),
+        'HOST': env.get('DB_HOST', 'localhost'),
+        'PORT': env.get('DB_PORT', '3306'),
+        'OPTIONS': {'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"},
     }
 }
 
